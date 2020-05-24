@@ -18,7 +18,7 @@ class Flags:
         self.ra = flags[7]
 
     def __str__(self):
-        return f"is request: {self.is_request}; type: {self.type}"
+        return f"Is request: {self.is_request}; type: {self.type}"
 
 
 class Header:
@@ -31,7 +31,7 @@ class Header:
         self.arcount = arc
 
     def __str__(self):
-        return f"flags: {str(self.flags)}; req_id: {self.id}"
+        return f"Flags: {str(self.flags)}; req_id: {self.id}"
 
 
 class Question:
@@ -39,8 +39,14 @@ class Question:
         self.domain = domain
         self.type = qtype
 
+    def __str__(self):
+        return f"Domain: {self.domain}; Type: {self.type}"
+
 
 class Request:
     def __init__(self, header, questions):
         self.header = header
         self.questions = questions
+
+    def __str__(self):
+        return f"Header: {{ {self.header} }}; Questions: [{'; '.join(map(str, self.questions))}]"
