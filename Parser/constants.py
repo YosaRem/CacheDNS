@@ -1,0 +1,72 @@
+class RequestTypes:
+    STANDARD = "standard"
+    INVERSE = "inverse"
+    STATUS_REQUEST = "status"
+    UNKNOWN = "unknown"
+
+    @staticmethod
+    def get_type(data):
+        if data == "0000":
+            return RequestTypes.STANDARD
+        if data == "0001":
+            return RequestTypes.INVERSE
+        if data == "0010":
+            return RequestTypes.STATUS_REQUEST
+        return RequestTypes.UNKNOWN
+
+    @staticmethod
+    def get_byte_type(data: str) -> bytes:
+        if data == RequestTypes.STANDARD:
+            return b"\x00\x00"
+        if data == RequestTypes.INVERSE:
+            return b"\x00\x01"
+        if data == RequestTypes.STATUS_REQUEST:
+            return b"\x00\x10"
+        return b"\x00\x00"
+
+
+class RecordTypes:
+    A = "A"
+    AAAA = "AAAA"
+    MX = "MX"
+    NS = "NS"
+    CNAME = "CNAME"
+    PTR = "PTR"
+
+    ABytes = b"\x00\x01"
+    AAAABytes = b"\x00\x1c"
+    MXBytes = b"\x00\x0f"
+    NSBytes = b"\x00\x02"
+    CNAMEBytes = b"\x00\x05"
+    PTRBytes = b"\x00\x0c"
+
+    @staticmethod
+    def get_type_from_bytes(data: bytes) -> str:
+        if data == RecordTypes.ABytes:
+            return RecordTypes.A
+        if data == RecordTypes.AAAABytes:
+            return RecordTypes.AAAA
+        if data == RecordTypes.MXBytes:
+            return RecordTypes.MX
+        if data == RecordTypes.NSBytes:
+            return RecordTypes.NS
+        if data == RecordTypes.CNAMEBytes:
+            return RecordTypes.CNAME
+        if data == RecordTypes.PTRBytes:
+            return RecordTypes.PTR
+
+    @staticmethod
+    def get_bytes_form_bytes(data: str) -> bytes:
+        if data == RecordTypes.A:
+            return RecordTypes.ABytes
+        if data == RecordTypes.AAAA:
+            return RecordTypes.AAAABytes
+        if data == RecordTypes.MX:
+            return RecordTypes.MXBytes
+        if data == RecordTypes.NS:
+            return RecordTypes.NSBytes
+        if data == RecordTypes.CNAME:
+            return RecordTypes.CNAMEBytes
+        if data == RecordTypes.PTR:
+            return RecordTypes.PTRBytes
+
