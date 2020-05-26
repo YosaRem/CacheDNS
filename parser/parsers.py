@@ -20,7 +20,6 @@ def parse_answer(data: bytes, position, count):
     for i in range(count):
         domain, position = parse_domain(data, start)
         start = position - 1
-        print(data[position:])
         qtype = RecordTypes.get_type_from_bytes(data[start:start + 2])
         start += 4
         ttl = int.from_bytes(data[start: start + 4], "big")
@@ -32,7 +31,6 @@ def parse_answer(data: bytes, position, count):
             answers.append(Answer(domain, qtype, ttl, length, answer_data))
         if qtype == RecordTypes.A:
             ip = parse_ip(data[start:start + 4])
-            print(ip)
             answers.append(Answer(domain, qtype, ttl, length, ip))
         else:
             answers.append(Answer(domain, qtype, ttl, length, data[start: start + length]))

@@ -4,7 +4,7 @@ from parser.common_parsers import str_to_hex, domain_to_bytes_str
 
 
 def insert_name_into_request(domain):
-    return "aa aa 01 00 00 01 00 00 00 00 00 00 {} 00 {} 00 01".format(domain_to_bytes_str(domain), RecordTypes.ANYStr)
+    return "aa aa 01 00 00 01 00 00 00 00 00 00 {} 00 {} 00 01".format(domain_to_bytes_str(domain), RecordTypes.AStr)
 
 
 d = str_to_hex(insert_name_into_request("e1.ru"))
