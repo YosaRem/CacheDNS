@@ -32,6 +32,7 @@ class RecordTypes:
     NS = "NS"
     CNAME = "CNAME"
     PTR = "PTR"
+    ANY = "ANY"
 
     ABytes = b"\x00\x01"
     AAAABytes = b"\x00\x1c"
@@ -39,6 +40,32 @@ class RecordTypes:
     NSBytes = b"\x00\x02"
     CNAMEBytes = b"\x00\x05"
     PTRBytes = b"\x00\x0c"
+    ANYBytes = b"\x00\xff"
+
+    AStr = "00 01"
+    AAAAStr = "00 1c"
+    MXStr = "00 0f"
+    NSStr = "00 02"
+    CNAMEStr = "00 05"
+    PTRStr = "00 0c"
+    ANYStr = "00 ff"
+
+    @staticmethod
+    def get_hex_str_form_str(data: str) -> str:
+        if data == RecordTypes.A:
+            return RecordTypes.AStr
+        if data == RecordTypes.AAAA:
+            return RecordTypes.AAAAStr
+        if data == RecordTypes.MX:
+            return RecordTypes.MXStr
+        if data == RecordTypes.NS:
+            return RecordTypes.NSStr
+        if data == RecordTypes.CNAME:
+            return RecordTypes.CNAMEStr
+        if data == RecordTypes.PTR:
+            return RecordTypes.PTRStr
+        if data == RecordTypes.ANY:
+            return RecordTypes.ANYStr
 
     @staticmethod
     def get_type_from_bytes(data: bytes) -> str:
@@ -54,9 +81,11 @@ class RecordTypes:
             return RecordTypes.CNAME
         if data == RecordTypes.PTRBytes:
             return RecordTypes.PTR
+        if data == RecordTypes.ANYBytes:
+            return RecordTypes.ANY
 
     @staticmethod
-    def get_bytes_form_bytes(data: str) -> bytes:
+    def get_bytes_form_str(data: str) -> bytes:
         if data == RecordTypes.A:
             return RecordTypes.ABytes
         if data == RecordTypes.AAAA:
@@ -69,4 +98,6 @@ class RecordTypes:
             return RecordTypes.CNAMEBytes
         if data == RecordTypes.PTR:
             return RecordTypes.PTRBytes
+        if data == RecordTypes.ANY:
+            return RecordTypes.ANYBytes
 

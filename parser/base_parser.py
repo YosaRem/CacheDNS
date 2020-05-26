@@ -14,22 +14,39 @@ def parse_headers(data: bytes) -> Header:
     return Header(request_id, flags, qdc, anc, nsc, rdc)
 
 
-def parse_domain(data: bytes) -> (str, int):
+def parse_domain(data: bytes, s_position, end=None) -> (str, int):
     def get_part(part_data):
         part_domain = BitArray(part_data)
         start = 0
-        count = int(part_domain.hex[start: start + 2], 16)
-        name = bytes.fromhex(part_domain.hex[2:count * 2 + 2]).decode("ascii")
-        return count, name
-    position = 0
+        if part_domain.hex[start: start + 2] == "c0":
+            return parse_domain_link(data, part_data[1])
+        else:
+            count = int(part_domain.hex[start: start + 2], 16)
+            name = bytes.fromhex(part_domain.hex[2:count * 2 + 2]).decode("ascii")
+            return count, name
+    position = s_position
     names = []
     while True:
+        if position == end:
+            break
         new_count, part_name = get_part(data[position:])
         if new_count == 0:
             break
         names.append(part_name)
         position += new_count + 1
     return ".".join(names), position + 1
+
+
+def parse_ip(data):
+    res = []
+    for i in data:
+        res.append(str(int(i)))
+    return ".".join(res)
+
+
+def parse_domain_link(data: bytes, position):
+    domain, count = parse_domain(data, position)
+    return 1, domain
 
 
 def parse_type(data):
