@@ -19,13 +19,16 @@ class CashRecord:
     def recalculate_ttl(self):
         self.ttl = self.time_added + self.ttl - time.time()
 
+    def __str__(self):
+        return f"{self.name} {self.type} {self.ttl}"
+
     def __hash__(self):
-        return md5(self.name + self.type).digest()
+        return int(md5(self.name.encode() + self.type.encode()).hexdigest(), 16)
 
 
 class Flags:
     def __init__(self, flags: BitArray):
-        self.is_request = not flags[0]
+        self.is_request = flags[0]
         self.type = RequestTypes.get_type(flags.bin[1:5])
         self.tc = flags[5]
         self.rd = flags[6]

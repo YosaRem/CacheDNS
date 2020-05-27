@@ -26,10 +26,13 @@ def parse_answer(data: bytes, position, count):
         start += 4
         length = int.from_bytes(data[start: start + 2], "big")
         start += 2
+        if qtype is None:
+            start += length
+            continue
         if qtype == RecordTypes.NS:
             answer_data, position = parse_domain(data, start, start + length)
             answers.append(Answer(domain, qtype, ttl, length, answer_data))
-        if qtype == RecordTypes.A:
+        elif qtype == RecordTypes.A:
             ip = parse_ip(data[start:start + 4])
             answers.append(Answer(domain, qtype, ttl, length, ip))
         else:
@@ -48,5 +51,7 @@ def parse_answers(data: bytes):
     header = parse_headers(data)
     queries, position = parse_queries(data, header.qdcount)
     answers, position = parse_answer(data, position, header.ancount)
-    return Response(header, queries, answers)
+    authority, position = parse_answer(data, position, header.nscount)
+    additional, position = parse_answer(data, position, header.arcount)
+    return Response(header, queries, answers, authority, additional)
 

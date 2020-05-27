@@ -24,24 +24,27 @@ class Server:
                     if data_to_send is not None:
                         self.socket_listener.sendto(data_to_send, sender)
                     else:
-                        self.get_from_ns(request)
+                        resp = self.get_from_ns(request)
+                        cash.add_to_cash(resp)
+                        data_to_send = self.get_from_cash(cash, request)
                         if data_to_send is not None:
                             self.socket_listener.sendto(data_to_send, sender)
                         self.socket_listener.sendto(b"", sender)
                 data, sender = self.socket_listener.recvfrom(512)
                 cash.del_ttl_expire()
 
-
-    def get_from_ns(self, request: Request):
+    def get_from_ns(self, request: Request) -> Response:
         answer = self.find_ns(request)
         answer = self.find_ip_for_ns(answer)
-        answer = self.find_any_record_on_ns(answer, request.questions[0].domain)
-        print(answer)
+        return self.find_any_record_on_ns(answer, request.questions[0].domain)
 
     def get_from_cash(self, cash, request):
         data = cash.get_from_cash(request)
         if data is None:
+            print("None in cash")
             return None
+        print("found in cash")
+        print(data)
         return b"\x00"
 
     def find_ns(self, request: Request):
@@ -69,7 +72,7 @@ class Server:
     def find_any_record_on_ns(response: Response, domain):
         req = Request(Header("aaaa", Flags(BitArray(b"\x01\x00")), 1, 0, 0, 0),
                       [Question(domain, RecordTypes.ANY)],
-                      str_to_hex("aa aa 01 00 00 01 00 00 00 00 00 00"))
+                      str_to_hex("aa 1a 01 00 00 01 00 00 00 00 00 00"))
         req_bytes = req.to_bytes()
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.sendto(req_bytes, (response.answers[0].data, 53))
