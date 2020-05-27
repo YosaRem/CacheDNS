@@ -16,7 +16,7 @@ class Client:
             raise ValueError("Invalid type value")
         self.data = str_to_hex(insert_info_into_request(q_name, q_type))
         self.address = "127.0.0.1"
-        self.port = 8000
+        self.port = 53
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.sendto(self.data, (self.address, self.port))
             data, sender = s.recvfrom(256)

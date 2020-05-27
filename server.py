@@ -9,7 +9,7 @@ from cash.Cash import Cash
 
 class Server:
     def __init__(self):
-        self.port_listener = 8000
+        self.port_listener = 53
         self.address_listener = "127.0.0.1"
         self.port_resolver = 53
         self.address_resolver = "77.88.8.8"  # yandex resolver
