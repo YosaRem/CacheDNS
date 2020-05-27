@@ -31,21 +31,21 @@ python3 client.py domain record-type
 
 ## Примеры запуска
 
-###1 Простой запрос
+### 1 Простой запрос
 Запрос клинета и ответ ему:
 ![First request](/images/1.png)
 
 WireShark:
 ![WireShark request](/images/2.png)
 
-###2 Повторный запрос
+### 2 Повторный запрос
 Повторный запрос клиента:
 ![First request](/images/3.png)
 
 WireShark:
 ![WireShark request](/images/4.png)
 
-###3 Получение информации, которую раньше не запрашивал, но она лежит в кэше
+### 3 Получение информации, которую раньше не запрашивал, но она лежит в кэше
 Запрос
 ![First request](/images/5.png)
 
