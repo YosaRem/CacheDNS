@@ -36,7 +36,7 @@ class RecordTypes:
     SOA = "SOA"
     TXT = "TXT"
 
-    ValidRequestType = [A, AAAA, MX, TXT]
+    ValidRequestType = [A, AAAA, MX, TXT, NS]
 
     ABytes = b"\x00\x01"
     AAAABytes = b"\x00\x1c"
@@ -119,5 +119,5 @@ class RecordTypes:
         if data == RecordTypes.SOA:
             return RecordTypes.SOAStr
         if data == RecordTypes.TXT:
-            return RecordTypes.TXTStr
+            return RecordTypes.TXTBytes
 

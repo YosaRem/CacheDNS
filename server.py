@@ -1,7 +1,7 @@
 import socket
 from bitstring import BitArray
 from parser.parsers import parse_request, parse_answers, cash_record_as_bytes
-from parser.models import Request, Question, Response, Header, Flags, Answer
+from parser.models import Request, Question, Response, Header, Flags
 from parser.constants import RecordTypes
 from parser.common_parsers import str_to_hex
 from cash.Cash import Cash
@@ -23,16 +23,16 @@ class Server:
                     records = self.get_from_cash(cash, request)
                     if records is not None:
                         res = cash_record_as_bytes(records, request)
-                        self.socket_listener.sendto(b"\x00", sender)
+                        self.socket_listener.sendto(res, sender)
                     else:
                         resp = self.get_from_ns(request)
                         cash.add_to_cash(resp)
                         records = self.get_from_cash(cash, request)
                         if records is not None:
                             res = cash_record_as_bytes(records, request)
-                            self.socket_listener.sendto(b"\x00", sender)
+                            self.socket_listener.sendto(res, sender)
                         else:
-                            self.socket_listener.sendto(b"", sender)
+                            self.socket_listener.sendto(Server.get_error_response(request), sender)
                 data, sender = self.socket_listener.recvfrom(512)
                 cash.del_ttl_expire()
 
@@ -68,6 +68,10 @@ class Server:
         data, sender = self.socket_resolver.recvfrom(512)
         data = parse_answers(data)
         return data
+
+    @staticmethod
+    def get_error_response(request: Request):
+        return str_to_hex(f"{request.header.id} 80 01 00 00 00 00 00 00 00 00")
 
     @staticmethod
     def find_any_record_on_ns(response: Response, domain):

@@ -96,10 +96,10 @@ class Answer:
             data_bytes = str_to_hex('{:02X}{:02X}{:02X}{:02X}'.format(*map(int, self.data.split("."))))
         else:
             data_bytes = self.data
-        return name_bytes + b"\x00" + type_bytes + b"\x00\x01" + ttl_bytes + length_bytes + data_bytes
+        return name_bytes + type_bytes + b"\x00\x01" + ttl_bytes + length_bytes + data_bytes
 
     def __str__(self):
-        return f"Name: {self.name}, type: {self.type}, ttl: {self.ttl}, data: {self.data}"
+        return f"Name: {self.name}, type: {self.type}, ttl: {self.ttl}, data: {self.data} \n"
 
 
 class Response:
@@ -125,8 +125,8 @@ class Response:
         return header_bytes + questions_bytes + answers_bytes
 
     def __str__(self):
-        return f"Header: {{ {self.header} }}; Questions:" \
-               f" [{'; '.join(map(str, self.questions))}]; Answers: [{'; '.join(map(str, self.answers))}"
+        return f"Header: {{ {self.header} }}; \nQuestions:" \
+               f" [{'; '.join(map(str, self.questions))}]; \nAnswers: [\n{' '.join(map(str, self.answers))}]"
 
 
 class Request:

@@ -1,5 +1,6 @@
 import socket
 from parser.constants import RecordTypes
+from parser.parsers import parse_answers
 from parser.common_parsers import str_to_hex, domain_to_bytes_str
 import argparse
 
@@ -18,15 +19,9 @@ class Client:
         self.port = 8000
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.sendto(self.data, (self.address, self.port))
-            data = s.recvfrom(256)
-            print(data)
-
-
-
-a = b'JJ\x80\x80\x00\x01\x00\x01\x00\x00\x00\x00\x03ns1\x03ngs\x02ru\x00\x00\x01\x00\x01\x03ns1\x03ngs\x02ru\x00\x00\x01\x00\x01\x00\x00\x0e\x0f\x00\x04\xc3\x13\xdc\xee'
-
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as soc:
-    soc.sendto(a, ("8.8.8.8", 53))
+            data, sender = s.recvfrom(256)
+            answer = parse_answers(data)
+            print(answer)
 
 
 def main():

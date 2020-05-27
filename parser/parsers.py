@@ -74,5 +74,4 @@ def cash_record_as_bytes(records: dict, request: Request):
         request.questions,
         answers
     )
-    print(res.to_bytes())
     return res.to_bytes()
