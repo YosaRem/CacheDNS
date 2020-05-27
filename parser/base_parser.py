@@ -34,6 +34,8 @@ def parse_domain(data: bytes, s_position, end=None) -> (str, int):
             break
         names.append(part_name)
         position += new_count + 1
+        if new_count == 1:
+            break
     return ".".join(names), position + 1
 
 

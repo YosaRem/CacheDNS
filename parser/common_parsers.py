@@ -9,3 +9,8 @@ def domain_to_bytes_str(domain):
 def str_to_hex(data):
     return bytearray.fromhex(data)
 
+
+def int_to_hex(value, size):
+    number = f"{value:x}"
+    zeros = size - len(number)
+    return str_to_hex(("0" * zeros) + number)

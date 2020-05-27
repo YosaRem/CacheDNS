@@ -1,7 +1,7 @@
 import socket
 from bitstring import BitArray
-from parser.parsers import parse_request, parse_answers
-from parser.models import Request, Question, Response, Header, Flags
+from parser.parsers import parse_request, parse_answers, cash_record_as_bytes
+from parser.models import Request, Question, Response, Header, Flags, Answer
 from parser.constants import RecordTypes
 from parser.common_parsers import str_to_hex
 from cash.Cash import Cash
@@ -20,16 +20,19 @@ class Server:
             while data is not None:
                 if data:
                     request = parse_request(data)
-                    data_to_send = self.get_from_cash(cash, request)
-                    if data_to_send is not None:
-                        self.socket_listener.sendto(data_to_send, sender)
+                    records = self.get_from_cash(cash, request)
+                    if records is not None:
+                        res = cash_record_as_bytes(records, request)
+                        self.socket_listener.sendto(b"\x00", sender)
                     else:
                         resp = self.get_from_ns(request)
                         cash.add_to_cash(resp)
-                        data_to_send = self.get_from_cash(cash, request)
-                        if data_to_send is not None:
-                            self.socket_listener.sendto(data_to_send, sender)
-                        self.socket_listener.sendto(b"", sender)
+                        records = self.get_from_cash(cash, request)
+                        if records is not None:
+                            res = cash_record_as_bytes(records, request)
+                            self.socket_listener.sendto(b"\x00", sender)
+                        else:
+                            self.socket_listener.sendto(b"", sender)
                 data, sender = self.socket_listener.recvfrom(512)
                 cash.del_ttl_expire()
 
@@ -41,13 +44,11 @@ class Server:
     def get_from_cash(self, cash, request):
         data = cash.get_from_cash(request)
         if data is None:
-            print("None in cash")
             return None
-        print("found in cash")
-        print(data)
-        return b"\x00"
+        print(str(data))
+        return data
 
-    def find_ns(self, request: Request):
+    def find_ns(self, request: Request) -> Response:
         ns_request = Request(
             request.header,
             [Question(request.questions[0].domain, RecordTypes.NS)],
@@ -59,7 +60,7 @@ class Server:
         return answer
 
     def find_ip_for_ns(self, response: Response):
-        domain = response.answers[0].data
+        domain = response.get_all_info()[0].data
         request = Request(Header("aaaa", Flags(BitArray(b"\x01\x00")), 1, 0, 0, 0),
                           [Question(domain, RecordTypes.A)], str_to_hex("aa aa 01 00 00 01 00 00 00 00 00 00"))
         req_bytes = request.to_bytes()

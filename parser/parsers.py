@@ -1,6 +1,7 @@
 from .base_parser import parse_headers, parse_domain, parse_ip
 from .constants import RecordTypes
-from .models import Question, Request, Answer, Response
+from .models import Question, Request, Answer, Response, Header, Flags
+from bitstring import BitArray
 
 
 def parse_queries(data: bytes, count):
@@ -29,7 +30,7 @@ def parse_answer(data: bytes, position, count):
         if qtype is None:
             start += length
             continue
-        if qtype == RecordTypes.NS:
+        if qtype == RecordTypes.NS or qtype == RecordTypes.SOA:
             answer_data, position = parse_domain(data, start, start + length)
             answers.append(Answer(domain, qtype, ttl, length, answer_data))
         elif qtype == RecordTypes.A:
@@ -53,5 +54,25 @@ def parse_answers(data: bytes):
     answers, position = parse_answer(data, position, header.ancount)
     authority, position = parse_answer(data, position, header.nscount)
     additional, position = parse_answer(data, position, header.arcount)
-    return Response(header, queries, answers, authority, additional)
+    return Response(data, header, queries, answers, authority, additional)
 
+
+def cash_record_as_bytes(records: dict, request: Request):
+    record_info = []
+    answers = []
+    anc = 0
+    for i in records:
+        anc += len(records[i])
+        record_info += records[i]
+    for i in record_info:
+        answers.append(
+            Answer(i.name, i.type, i.ttl, i.length, i.data))
+    res = Response(
+        b"\x00",
+        Header(request.header.id, Flags(BitArray(b"\x80\x80")),
+               request.header.qdcount, anc, 0, 0),
+        request.questions,
+        answers
+    )
+    print(res.to_bytes())
+    return res.to_bytes()

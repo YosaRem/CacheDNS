@@ -36,6 +36,8 @@ class RecordTypes:
     SOA = "SOA"
     TXT = "TXT"
 
+    ValidRequestType = [A, AAAA, MX, TXT]
+
     ABytes = b"\x00\x01"
     AAAABytes = b"\x00\x1c"
     MXBytes = b"\x00\x0f"

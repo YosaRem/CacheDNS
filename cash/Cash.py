@@ -7,24 +7,26 @@ class Cash:
         self.info = {}
 
     def get_from_cash(self, request: Request):
-        res = []
+        res = {}
         for i in request.questions:
             data = self.info.get((i.domain, i.type))
-            for j in data:
-                if not j.is_expire():
-                    j.recalculate_ttl()
-                    res.append(j)
+            if data is not None:
+                res[i] = []
+                for j in data:
+                    if not j.is_expire():
+                        j.recalculate_ttl()
+                        res[i].append(j)
         if len(res) == 0:
             return None
         return res
 
     def add_to_cash(self, response: Response):
         for i in response.answers + response.authority + response.additional:
-            record = CashRecord(i.name, i.type, i.ttl, i.data)
-            if (i.domain, i.type) in self.info:
-                self.info[(i.domain, i.type)].append(record)
+            record = CashRecord(i.name, i.type, i.ttl, i.length, i.data)
+            if (i.name, i.type) in self.info:
+                self.info[(i.name, i.type)].append(record)
             else:
-                self.info[(i.domain, i.type)] = [record]
+                self.info[(i.name, i.type)] = [record]
 
     def del_ttl_expire(self):
         new = {}

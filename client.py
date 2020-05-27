@@ -1,26 +1,41 @@
 import socket
 from parser.constants import RecordTypes
 from parser.common_parsers import str_to_hex, domain_to_bytes_str
+import argparse
 
 
-def insert_name_into_request(domain):
-    return "4a 4a 01 00 00 01 00 00 00 00 00 00 {} 00 {} 00 01".format(domain_to_bytes_str(domain), RecordTypes.AStr)
-
-
-d = str_to_hex(insert_name_into_request("e1.ru"))
+def insert_info_into_request(domain, q_type):
+    return "4a 4a 01 00 00 01 00 00 00 00 00 00 {} 00 {} 00 01".format(domain_to_bytes_str(domain),
+                                                                       RecordTypes.get_hex_str_form_str(q_type))
 
 
 class Client:
     def __init__(self, q_name, q_type):
-        self.name = q_name
-        self.type = q_type
+        if q_type not in RecordTypes.ValidRequestType:
+            raise ValueError("Invalid type value")
+        self.data = str_to_hex(insert_info_into_request(q_name, q_type))
         self.address = "127.0.0.1"
         self.port = 8000
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-            s.sendto(d, (self.address, self.port))
+            s.sendto(self.data, (self.address, self.port))
             data = s.recvfrom(256)
             print(data)
 
 
-Client("a", "a")
 
+a = b'JJ\x80\x80\x00\x01\x00\x01\x00\x00\x00\x00\x03ns1\x03ngs\x02ru\x00\x00\x01\x00\x01\x03ns1\x03ngs\x02ru\x00\x00\x01\x00\x01\x00\x00\x0e\x0f\x00\x04\xc3\x13\xdc\xee'
+
+with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as soc:
+    soc.sendto(a, ("8.8.8.8", 53))
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Client for cash dns')
+    parser.add_argument("domain", help="domain that you search")
+    parser.add_argument("--type", default="A", help="Type of record that you search (A, AAAA, NS, TXT, MX)")
+    args = parser.parse_args()
+    Client(args.domain, args.type)
+
+
+if __name__ == "__main__":
+    main()
