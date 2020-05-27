@@ -6,7 +6,7 @@ from .constants import RecordTypes
 def parse_headers(data: bytes) -> Header:
     bit_data = BitArray(data)
     request_id = bit_data.hex[0:4]
-    flags = Flags(BitArray(bit_data.bytes[4:8]))
+    flags = Flags(BitArray(bit_data.bytes[4:6]))
     qdc = int(bit_data.hex[8:12], 16)
     anc = int(bit_data.hex[12:16], 16)
     nsc = int(bit_data.hex[16:20], 16)
@@ -26,8 +26,11 @@ def parse_domain(data: bytes, s_position, end=None) -> (str, int):
             return count, name
     position = s_position
     names = []
+    if end is None:
+        end = -1
     while True:
-        if position == end:
+        if position == int(end) + 1:
+            position += 1
             break
         new_count, part_name = get_part(data[position:])
         if new_count == 0:

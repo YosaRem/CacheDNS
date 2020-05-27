@@ -95,7 +95,10 @@ class Answer:
         elif self.type == RecordTypes.A:
             data_bytes = str_to_hex('{:02X}{:02X}{:02X}{:02X}'.format(*map(int, self.data.split("."))))
         else:
-            data_bytes = self.data
+            if type(self.data) == str:
+                data_bytes = str_to_hex(self.data)
+            else:
+                data_bytes = self.data
         return name_bytes + type_bytes + b"\x00\x01" + ttl_bytes + length_bytes + data_bytes
 
     def __str__(self):

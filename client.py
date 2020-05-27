@@ -27,10 +27,12 @@ class Client:
 def main():
     parser = argparse.ArgumentParser(description='Client for cash dns')
     parser.add_argument("domain", help="domain that you search")
-    parser.add_argument("--type", default="A", help="Type of record that you search (A, AAAA, NS, TXT, MX)")
+    parser.add_argument("type", default="A", help="Type of record that you search (A, AAAA, NS, TXT, MX)")
     args = parser.parse_args()
     Client(args.domain, args.type)
 
 
 if __name__ == "__main__":
     main()
+
+

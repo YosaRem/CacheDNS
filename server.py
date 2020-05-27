@@ -32,20 +32,27 @@ class Server:
                             res = cash_record_as_bytes(records, request)
                             self.socket_listener.sendto(res, sender)
                         else:
-                            self.socket_listener.sendto(Server.get_error_response(request), sender)
+                            find_req = Request(request.header,
+                                             [Question(request.questions[0].domain, request.questions.type)],
+                                             request.byte_header)
+                            byte_request = find_req.to_bytes()
+                            self.socket_resolver.sendto(byte_request, (self.address_resolver, self.port_resolver))
+                            answer, s = self.socket_resolver.recvfrom(512)
+                            cash.add_to_cash(parse_answers(answer))
+                            self.socket_listener.sendto(answer, sender)
                 data, sender = self.socket_listener.recvfrom(512)
                 cash.del_ttl_expire()
 
     def get_from_ns(self, request: Request) -> Response:
         answer = self.find_ns(request)
         answer = self.find_ip_for_ns(answer)
-        return self.find_any_record_on_ns(answer, request.questions[0].domain)
+        a = self.find_any_record_on_ns(answer, request.questions[0].domain)
+        return a
 
     def get_from_cash(self, cash, request):
         data = cash.get_from_cash(request)
         if data is None:
             return None
-        print(str(data))
         return data
 
     def find_ns(self, request: Request) -> Response:

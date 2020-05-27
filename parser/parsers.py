@@ -30,7 +30,7 @@ def parse_answer(data: bytes, position, count):
         if qtype is None:
             start += length
             continue
-        if qtype == RecordTypes.NS or qtype == RecordTypes.SOA:
+        if qtype == RecordTypes.NS:
             answer_data, position = parse_domain(data, start, start + length)
             answers.append(Answer(domain, qtype, ttl, length, answer_data))
         elif qtype == RecordTypes.A:
